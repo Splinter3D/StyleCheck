@@ -1,0 +1,7 @@
+- id: splinter3d-style
+  name: splinter3d-style
+  description: Run the Splinter3D style checker.
+  entry: splinter3d_style
+  language: python
+  types: [python]
+  require_serial: true
