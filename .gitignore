@@ -59,3 +59,8 @@ vcpkg/
 
 !/scripts/build.sh.d
 !/scripts/style.sh.d
+
+# Python cache
+__pycache__/
+.pytest_cache/
+dist/
