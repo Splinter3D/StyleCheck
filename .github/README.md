@@ -58,7 +58,7 @@ pipx install "$(ls dist/*.whl | head -n 1)"
 Install a published release artifact with `pipx`:
 
 ```bash
-pipx install https://github.com/<owner>/StyleCheck/releases/download/vX.Y.Z/splinter3d_style-X.Y.Z-py3-none-any.whl
+pipx install https://github.com/Splinter3D/StyleCheck/releases/download/vX.Y.Z/splinter3d_style-X.Y.Z-py3-none-any.whl
 splinter3d_style
 ```
 
@@ -68,7 +68,7 @@ Add this repository and a release tag to your `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://github.com/<owner>/StyleCheck
+  - repo: https://github.com/Splinter3D/StyleCheck
     rev: vX.Y.Z
     hooks:
       - id: splinter3d-style
