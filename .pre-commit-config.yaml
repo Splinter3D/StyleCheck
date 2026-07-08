@@ -23,13 +23,19 @@ repos:
     hooks:
       - id: check_versions
         name: check_versions
-        entry: bash -c 'scripts/check_versions.sh'
+        entry: bash -c 'scripts/check-versions.sh'
         language: system
         pass_filenames: false
         always_run: true
       - id: run_tests
         name: Run tests
         entry: bash -c 'poetry run pytest tests/ -v'
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: splinter3d-style
+        name: splinter3d-style
+        entry: bash -c 'poetry run splinter3d_style'
         language: system
         pass_filenames: false
         always_run: true
