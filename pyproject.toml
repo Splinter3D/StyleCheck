@@ -1,0 +1,33 @@
+[project]
+name = "splinter3d_style"
+version = "0.1.0"
+description = "A style checker for Splinter3D projects."
+readme = ".github/README.md"
+requires-python = ">=3.10"
+[[project.authors]]
+name = "Mathieu BARLEON"
+email = "mathieu.barleon@splinter3d.com"
+
+[project.scripts]
+splinter3d_style = "splinter3d_style.main:main"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+[[tool.poetry.packages]]
+include = "splinter3d_style"
+from = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["src"]
+addopts = "-v"
+
+[dependency-groups]
+dev = [
+    "build (>=1.3.0,<2.0.0)",
+    "commitizen (>=4.9.1,<5.0.0)",
+    "pytest (>=9.1.1,<10.0.0)",
+    "tomlkit (>=0.15.0,<0.16.0)"
+]
