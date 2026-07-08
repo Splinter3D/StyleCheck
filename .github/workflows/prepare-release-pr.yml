@@ -21,7 +21,8 @@ jobs:
     if: >-
       github.event.pull_request.merged == true &&
       github.event.pull_request.base.ref == 'dev' &&
-      github.event.pull_request.head.ref != 'release/dev'
+      github.event.pull_request.head.ref != 'release/dev' &&
+      github.event.pull_request.head.ref != 'main'
     runs-on: ubuntu-latest
     environment:
       name: release-rc
