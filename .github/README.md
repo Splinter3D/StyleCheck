@@ -58,8 +58,16 @@ pipx install "$(ls dist/*.whl | head -n 1)"
 Install a published release artifact with `pipx`:
 
 ```bash
-pipx install https://github.com/Splinter3D/StyleCheck/releases/download/vX.Y.Z/splinter3d_style-X.Y.Z-py3-none-any.whl
+pipx install git+https://github.com/Splinter3D/StyleCheck
 splinter3d_style
+```
+
+## Update From A Release
+
+Update a the package with pipx
+
+```bash
+pipx upgrade splinter3d_style
 ```
 
 ## Use With pre-commit
