@@ -20,58 +20,37 @@ jobs:
   tag-dev:
     if: >-
       github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'dev'
+      github.event.pull_request.base.ref == 'dev' &&
+      github.event.pull_request.head.ref == 'release/dev'
     runs-on: ubuntu-latest
     environment:
       name: release-rc
-
     outputs:
       tag_name: ${{ steps.version.outputs.tag }}
 
     steps:
-      - name: Check out base branch
-        uses: actions/checkout@v7
+      - name: Check out dev
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || github.event.pull_request.base.ref }}
+          ref: dev
           fetch-depth: 0
 
       - name: Fetch tags
         run: git fetch --force --tags origin
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Commitizen
-        run: python -m pip install --upgrade pip commitizen tomlkit
+      - name: Install release tooling
+        run: python -m pip install --upgrade pip commitizen
 
       - name: Compute release candidate tag
         id: version
         run: |
           tag="$(./scripts/next-tag.sh rc)"
-          python_version="$(./scripts/tag-to-python-version.sh "$tag")"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "python_version=$python_version" >> "$GITHUB_OUTPUT"
-
-      - name: Update changelog and project version
-        run: |
-          tag="${{ steps.version.outputs.tag }}"
-          python_version="${{ steps.version.outputs.python_version }}"
-
-          cz changelog --unreleased-version="$tag"
-          ./scripts/check-versions.sh --fix "$tag"
-          git add CHANGELOG.md pyproject.toml
-
-          if git diff --cached --quiet; then
-            echo "No release file changes detected."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(release): ${python_version}"
-          git push origin HEAD:dev
 
       - name: Create tag
         run: |
@@ -84,14 +63,14 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin dev --tags
           git tag -a "$tag" -m "Release candidate $tag"
           git push origin "$tag"
 
   release-dev:
     if: >-
       github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'dev'
+      github.event.pull_request.base.ref == 'dev' &&
+      github.event.pull_request.head.ref == 'release/dev'
     needs: tag-dev
     uses: ./.github/workflows/release.yml
     secrets: inherit
@@ -103,58 +82,37 @@ jobs:
   tag-main:
     if: >-
       github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'main'
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'hotfix/release-main'
     runs-on: ubuntu-latest
     environment:
       name: release
-
     outputs:
       tag_name: ${{ steps.version.outputs.tag }}
 
     steps:
-      - name: Check out base branch
-        uses: actions/checkout@v7
+      - name: Check out main
+        uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || github.event.pull_request.base.ref }}
+          ref: main
           fetch-depth: 0
 
       - name: Fetch tags
         run: git fetch --force --tags origin
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install Commitizen
-        run: python -m pip install --upgrade pip commitizen tomlkit
+      - name: Install release tooling
+        run: python -m pip install --upgrade pip commitizen
 
       - name: Compute stable tag
         id: version
         run: |
           tag="$(./scripts/next-tag.sh stable)"
-          python_version="$(./scripts/tag-to-python-version.sh "$tag")"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "python_version=$python_version" >> "$GITHUB_OUTPUT"
-
-      - name: Update changelog and project version
-        run: |
-          tag="${{ steps.version.outputs.tag }}"
-          python_version="${{ steps.version.outputs.python_version }}"
-
-          cz changelog --unreleased-version="$tag"
-          ./scripts/check-versions.sh --fix "$tag"
-          git add CHANGELOG.md pyproject.toml
-
-          if git diff --cached --quiet; then
-            echo "No release file changes detected."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(release): ${python_version}"
-          git push origin HEAD:main
 
       - name: Create tag
         run: |
@@ -167,14 +125,14 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main --tags
           git tag -a "$tag" -m "Release $tag"
           git push origin "$tag"
 
   release-main:
     if: >-
       github.event.pull_request.merged == true &&
-      github.event.pull_request.base.ref == 'main'
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.ref == 'hotfix/release-main'
     needs: tag-main
     uses: ./.github/workflows/release.yml
     secrets: inherit
