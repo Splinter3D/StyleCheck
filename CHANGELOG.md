@@ -1,3 +1,10 @@
+## v0.2.2-rc.1 (2026-07-08)
+
+### Fix
+
+- test ci
+- workflow definitions
+
 ## v0.2.1 (2026-07-08)
 
 ### Fix
