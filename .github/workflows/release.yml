@@ -114,10 +114,26 @@ jobs:
           path: dist
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ needs.prepare.outputs.tag_name }}
-          name: "Release: ${{ needs.prepare.outputs.tag_name }}"
-          files: dist/*
-          generate_release_notes: true
-          prerelease: ${{ needs.prepare.outputs.prerelease == 'true' }}
+        run: |
+          tag="${{ needs.prepare.outputs.tag_name }}"
+          title="Release: ${tag}"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists, skipping."
+            exit 0
+          fi
+
+          args=(
+            release create "$tag"
+            dist/*
+            --title "$title"
+            --generate-notes
+          )
+
+          if [[ "${{ needs.prepare.outputs.prerelease }}" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+
+          gh "${args[@]}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
