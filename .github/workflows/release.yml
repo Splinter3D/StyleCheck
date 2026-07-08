@@ -4,18 +4,82 @@ on:
   push:
     tags:
       - "v*"
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+      prerelease:
+        required: true
+        type: boolean
+      environment_name:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag to release"
+        required: true
+        type: string
+      prerelease:
+        description: "Publish as prerelease"
+        required: true
+        type: boolean
+      environment_name:
+        description: "GitHub environment to use"
+        required: true
+        type: choice
+        options:
+          - release
+          - release-rc
 
 permissions:
   contents: write
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.vars.outputs.tag_name }}
+      prerelease: ${{ steps.vars.outputs.prerelease }}
+      environment_name: ${{ steps.vars.outputs.environment_name }}
+
+    steps:
+      - name: Resolve release parameters
+        id: vars
+        run: |
+          tag_name="${{ inputs.tag_name || github.ref_name }}"
+          prerelease="${{ inputs.prerelease }}"
+          environment_name="${{ inputs.environment_name }}"
+
+          if [[ -z "$prerelease" ]]; then
+            if [[ "$tag_name" == *-rc.* ]]; then
+              prerelease=true
+            else
+              prerelease=false
+            fi
+          fi
+
+          if [[ -z "$environment_name" ]]; then
+            if [[ "$tag_name" == *-rc.* ]]; then
+              environment_name=release-rc
+            else
+              environment_name=release
+            fi
+          fi
+
+          echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "environment_name=$environment_name" >> "$GITHUB_OUTPUT"
+
   build:
     runs-on: ubuntu-latest
-
+    needs: prepare
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
         with:
+          ref: refs/tags/${{ needs.prepare.outputs.tag_name }}
           fetch-depth: 0
 
       - name: Set up Python
@@ -34,37 +98,17 @@ jobs:
           name: dist
           path: dist/*
 
-  publish-prerelease:
-    if: contains(github.ref_name, '-rc.')
+  publish:
     runs-on: ubuntu-latest
     environment:
-      name: release-rc
-    needs: build
+      name: ${{ needs.prepare.outputs.environment_name }}
+    needs:
+      - prepare
+      - build
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v7
-        with:
-          name: dist
-          path: dist
-
-      - name: Create GitHub prerelease
-        uses: softprops/action-gh-release@v3
-        with:
-          files: dist/*
-          generate_release_notes: true
-          prerelease: true
-
-  publish-release:
-    if: ${{ !contains(github.ref_name, '-rc.') }}
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: release
-
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist
@@ -72,5 +116,8 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ needs.prepare.outputs.tag_name }}
+          name: "Release: ${{ needs.prepare.outputs.tag_name }}"
           files: dist/*
           generate_release_notes: true
+          prerelease: ${{ needs.prepare.outputs.prerelease == 'true' }}
