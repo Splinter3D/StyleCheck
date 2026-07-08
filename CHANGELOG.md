@@ -1,3 +1,9 @@
+## v0.1.3 (2026-07-08)
+
+### Fix
+
+- use tag name instead of branch for release
+
 ## v0.1.2 (2026-07-08)
 
 ### Fix
