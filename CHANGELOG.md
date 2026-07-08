@@ -1,3 +1,15 @@
+## v0.1.5 (2026-07-08)
+
+### Fix
+
+- avoid backmerge pr creating a rc release
+
+## v0.1.4 (2026-07-08)
+
+### Fix
+
+- avoid direct push on protected branches
+
 ## v0.1.3 (2026-07-08)
 
 ### Fix
