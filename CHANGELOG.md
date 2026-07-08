@@ -1,3 +1,9 @@
+## v0.2.0-rc.1 (2026-07-08)
+
+### Feat
+
+- add style check to pre-commit
+
 ## v0.1.5 (2026-07-08)
 
 ### Fix
