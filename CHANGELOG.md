@@ -1,3 +1,9 @@
+## v0.2.3 (2026-07-09)
+
+### Fix
+
+- updated installation documentation
+
 ## v0.2.2 (2026-07-08)
 
 ## v0.2.2-rc.1 (2026-07-08)
