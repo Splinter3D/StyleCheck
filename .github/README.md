@@ -29,8 +29,13 @@ poetry run python -m build
 ls dist/
 ```
 
-Test the built package rather than the source tree:
-
+Test the built wheel rather than running from the source tree:
+```bash
+uv tool install ./dist/splinter3d_style-X.Y.Z-py3-none-any.whl
+splinter3d_style
+uv tool uninstall splinter3d_style
+```
+or
 ```bash
 pipx install ./dist/splinter3d_style-X.Y.Z-py3-none-any.whl
 splinter3d_style
@@ -50,24 +55,57 @@ deactivate
 `X.Y.Z` is a placeholder. Use the actual filename created in `dist/`, or install the first built wheel directly:
 
 ```bash
+uv tool install "$(ls dist/*.whl | head -n 1)"
+```
+or
+```bash
 pipx install "$(ls dist/*.whl | head -n 1)"
 ```
 
-## Install From A Release
-
-Install a published release artifact with `pipx`:
+## Run Without Installing
 
 ```bash
+uvx --from git+https://github.com/Splinter3D/StyleCheck splinter3d_style
+```
+or
+```bash
+pipx run --spec git+https://github.com/Splinter3D/StyleCheck splinter3d_style
+```
+
+## Install From Git
+
+```bash
+uv tool install git+https://github.com/Splinter3D/StyleCheck
+```
+or
+```bash
 pipx install git+https://github.com/Splinter3D/StyleCheck
+```
+then
+```bash
 splinter3d_style
 ```
 
 ## Update From A Release
 
-Update a the package with pipx
+Update a the package with the package manager you chose for install
 
 ```bash
+uv tool upgrade splinter3d_style
+```
+or
+```bash
 pipx upgrade splinter3d_style
+```
+
+## Remove the Installed Tool
+
+```bash
+uv tool uninstall splinter3d_style
+```
+or
+```bash
+pipx uninstall splinter3d_style
 ```
 
 ## Use With pre-commit
